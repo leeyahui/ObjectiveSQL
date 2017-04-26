@@ -46,17 +46,33 @@ namespace ObjectiveSQL
 
         public class Pair
         {
-
+            /// <summary>
+            /// And Or连接符
+            /// </summary>
             public Pref pref { get; set; }
 
             public string name { get; set; }
 
             public object value { get; set; }
 
+
+            /// <summary>
+            /// 撇号 '
+            /// </summary>
+            public bool apostrophe { get; set; }
+
             public Pair(string name, object value)
             {
                 this.name = name;
                 this.value = value;
+            }
+
+
+            public Pair(string name, object value, bool apostrophe)
+            {
+                this.name = name;
+                this.value = value;
+                this.apostrophe = apostrophe;
             }
 
             public Pair(Pref pref, string name, object value)
@@ -118,7 +134,10 @@ namespace ObjectiveSQL
             {
                 StringBuilder s = new StringBuilder();
                 for (int size = pairs.Count, i = 0; i < size; i++)
-                    s.Append(pairs[i].value.ToString()).Append(i == size - 1 ? "" : ",");
+                {
+                    s.Append(pairs[i].apostrophe ? ("'" + pairs[i].value + "'") : pairs[i].value.ToString())
+                     .Append(i == size - 1 ? "" : ",");
+                }
                 return s.ToString();
             }
 
@@ -142,13 +161,13 @@ namespace ObjectiveSQL
                 return (T)this;
             }
 
-            public T Where(string column, object value)
+            public T Where(string column, object value, bool apostrophe = true)
             {
                 if (this is Insert)
                 {
                     throw new Exception("cannot use 'where' block in Insert");
                 }
-                this.conditions.Add(new Pair(column, value));
+                this.conditions.Add(new Pair(column, value, apostrophe));
                 return (T)this;
             }
 
@@ -176,9 +195,11 @@ namespace ObjectiveSQL
                 return (T)this;
             }
 
-            public T And(string column, object value)
+            public T And(string column, object value, bool apostrophe = true)
             {
-                this.conditions.Add(new Pair(Pref.AND, column, value));
+                Pair pair = new Pair(Pref.AND, column, value);
+                pair.apostrophe = apostrophe;
+                this.conditions.Add(pair);
                 return (T)this;
             }
 
@@ -310,7 +331,7 @@ namespace ObjectiveSQL
 
                     foreach (string o in (List<string>)condition.value)
                     {
-                        marks += o+",";
+                        marks += o + ",";
                         this.@params.Add(o);
                     }
 
@@ -325,8 +346,8 @@ namespace ObjectiveSQL
                 }
                 else
                 {
-                   // where += condition.name;
-                    where += condition.name.Replace("?", condition.value.ToString());
+                    // where += condition.name;
+                    where += condition.name.Replace("?", condition.apostrophe ? "'" + condition.value + "'" : condition.value.ToString());
                     this.@params.Add(condition.value.ToString());
                 }
 
@@ -345,10 +366,18 @@ namespace ObjectiveSQL
                 this.table = table;
             }
 
-            public Insert Values(string column, object value)
+            /// <summary>
+            /// 设定insert value值
+            /// </summary>
+            /// <param name="column">列名称</param>
+            /// <param name="value">设定值</param>
+            /// <param name="apostrophe">默认使用撇号'</param>
+            /// <returns></returns>
+            public Insert Values(string column, object value, bool apostrophe = true)
             {
                 if (value != null)
-                    pairs.Add(new Pair(column, value));
+                    pairs.Add(new Pair(column, value, apostrophe));
+
                 return this;
             }
 
@@ -410,7 +439,7 @@ namespace ObjectiveSQL
                     else
                     {
                         this.@params.Add(pair.value.ToString());
-                        statement += pair.name + " = '"+pair.value.ToString()+"'";
+                        statement += pair.name + (pair.apostrophe ? " = '" + pair.value.ToString() + "'" : "=" + pair.value.ToString());
                     }
 
                     if (i < updatesSize - 1)
@@ -431,9 +460,10 @@ namespace ObjectiveSQL
                 return this;
             }
 
-            public Update Set(string column, object value)
+            public Update Set(string column, object value, bool apostrophe = true)
             {
-                this.updates.Add(new Pair(column, value));
+                if (value != null)
+                    this.updates.Add(new Pair(column, value, apostrophe));
                 return this;
             }
 

@@ -9,3 +9,6 @@ D:\CSharp_Projects\ObjectiveSQL\ObjectiveSQL\bin\Debug\ObjectiveSQL.exe
 D:\CSharp_Projects\ObjectiveSQL\ObjectiveSQL\bin\Debug\ObjectiveSQL.pdb
 D:\CSharp_Projects\ObjectiveSQL\ObjectiveSQL\obj\x86\Debug\ObjectiveSQL.csprojResolveAssemblyReference.cache
 D:\CSharp_Projects\ObjectiveSQL\ObjectiveSQL\bin\Debug\ObjectiveSQL.exe.config
+D:\task\ObjectiveSQL\ObjectiveSQL\ObjectiveSQL\bin\Debug\ObjectiveSQL.exe.config
+D:\task\ObjectiveSQL\ObjectiveSQL\ObjectiveSQL\obj\x86\Debug\ObjectiveSQL.exe
+D:\task\ObjectiveSQL\ObjectiveSQL\ObjectiveSQL\obj\x86\Debug\ObjectiveSQL.pdb
